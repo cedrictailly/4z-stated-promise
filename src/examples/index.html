@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>StatedPromise</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      font-family: monospace;
+    }
+
+    th,
+    td {
+      border: 1px solid #888;
+      padding: 0.5rem;
+      text-align: left;
+    }
+
+    th {
+      background-color: #444;
+      color: white;
+    }
+
+    td {
+      background-color: #ccc;
+    }
+  </style>
+  <script src="../../dist/4z-stated-promise.min.js"></script>
+  <script>
+
+    window.addEventListener("DOMContentLoaded", async () => {
+
+      function log(promises) {
+
+        let tr = document.createElement('tr');
+
+        const tdTime = document.createElement('th');
+
+        tdTime.rowSpan = promises.length;
+        tdTime.innerHTML = new Date().toISOString();
+
+        tr.appendChild(tdTime);
+
+        for (const promise of promises) {
+
+          const tdState = document.createElement('td');
+          const tdValue = document.createElement('td');
+          const tdReason = document.createElement('td');
+
+          tdState.innerHTML = JSON.stringify(promise.state);
+          tdValue.innerHTML = JSON.stringify(promise.value);
+          tdReason.innerHTML = JSON.stringify(promise.reason);
+
+          tr.appendChild(tdState);
+          tr.appendChild(tdValue);
+          tr.appendChild(tdReason);
+
+          logs.appendChild(tr);
+
+          tr = document.createElement('tr');
+        }
+      }
+
+      const promises = [];
+
+      promises.push(new StatedPromise((resolve, reject) => {
+        resolve(true);
+      }));
+
+      promises.push(new StatedPromise((resolve, reject) => {
+        setTimeout(resolve, 500, true);
+      }));
+
+      log(promises);
+
+      await Promise.all(promises.filter(p => p.state == "pending"));
+
+      log(promises);
+    });
+
+  </script>
+</head>
+
+<body>
+  <table>
+    <tr>
+      <th>Time</th>
+      <th>State</th>
+      <th>Value</th>
+      <th>Reason</th>
+    </tr>
+    <tbody id="logs"></tbody>
+  </table>
+</body>
+
+</html>
